@@ -71,7 +71,7 @@ function App() {
           goToPrevPage = {prevPageUrl ? goToPrevPage : null}
         />
       </Container>
-
+      <p className="text-center mt-4">Source Code: <a href="https://github.com/SimoSultan/react-pokemon" target="blank">https://github.com/SimoSultan/react-pokemon</a></p>
     </Container>
   );
 
