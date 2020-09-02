@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import PokemonList from './PokemonList';
 import Pagination from './Pagination';
+import PokemonShow from './PokemonShow';
 // a module used to make asynchronous requests to APIs
 // works similarly to fetch
 import axios from 'axios'
 import Container from 'react-bootstrap/Container'
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+
 
 function App() {
 
@@ -15,6 +18,7 @@ function App() {
   const [nextPageUrl, setNextPageUrl] = useState()
   const [prevPageUrl, setPrevPageUrl] = useState()
   const [loading, setLoading] = useState(true)
+  const [summaryPokemon, setSummaryPokemon] = useState(null)
 
   // this is a hook that takes a function
   // it runs every single time based on the props that we pass
@@ -33,7 +37,6 @@ function App() {
       setNextPageUrl(res.data.next)
       setPrevPageUrl(res.data.previous)
       // when the result comes through from the promise, map over the array of objects to get the name
-      // setPokemon(res.data.results.map(p => p.name))
       setPokemon(res.data.results)
     })
 
@@ -47,10 +50,22 @@ function App() {
     // but putting currentPageUrl in there, if the contents have changed in that url, then re-run the effect
   }, [currentPageUrl])
 
+
+
+  function changeSummaryPokemon(url) {
+    setLoading(true)
+    axios.get(url).then(res => {
+      // when the request is fetched, then set loading state to false
+      setLoading(false)
+      setSummaryPokemon({name: res.data.name, id: res.data.id})
+    })
+  }
+
   //Pagination component uses these
   function goToNextPage() {
     setCurrentPageUrl(nextPageUrl)
   }
+
   function goToPrevPage() {
     setCurrentPageUrl(prevPageUrl)
   }
@@ -64,14 +79,30 @@ function App() {
     <Container className="mt-5 mb-5">
       <h1 className="header text-center">Simo_Sultan's Pokemon React App</h1>
       {/* we need to pass the pokemonList component our pokemon */}
-      <PokemonList pokemon={pokemon}/>
-      <Container className="d-flex justify-content-center">
-        <Pagination
-          goToNextPage = {nextPageUrl ? goToNextPage : null}
-          goToPrevPage = {prevPageUrl ? goToPrevPage : null}
-        />
-      </Container>
+
+      { summaryPokemon == null 
+        ? 
+          <>
+            <PokemonList 
+              pokemon = { pokemon } 
+              changeSummaryPokemon = { changeSummaryPokemon } 
+            />
+            <Container className="d-flex justify-content-center">
+              <Pagination
+                goToNextPage = { nextPageUrl ? goToNextPage : null }
+                goToPrevPage = { prevPageUrl ? goToPrevPage : null }
+              />
+            </Container>
+          </>
+        : 
+          <PokemonShow 
+            summaryPokemon = { summaryPokemon } 
+            setSummaryPokemon = { setSummaryPokemon } 
+          />
+      }
+      
       <p className="text-center mt-4"><strong>Source Code:</strong> <a href="https://github.com/SimoSultan/react-pokemon" target="blank">https://github.com/SimoSultan/react-pokemon</a></p>
+
     </Container>
   );
 
